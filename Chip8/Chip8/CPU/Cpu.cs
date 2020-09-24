@@ -55,7 +55,7 @@ namespace Chip8.CPU
                 byte n = (byte)(opcode & 0x000F);
                 var x = (ushort)(opcode & 0x0F00) >> 8;
                 var y = (byte)(opcode & 0x00F0) >> 4;
-                
+
                 ushort nibble = (ushort)(opcode & 0x0F000);
 
                 switch (nibble)
@@ -82,7 +82,7 @@ namespace Chip8.CPU
                         break;
 
                     case 0x5000:
-                        if (register[x] != register[y]) ram.SkipNextInstruction();
+                        if (register[x] == register[y]) ram.SkipNextInstruction();
                         break;
 
                     case 0x6000:
@@ -111,16 +111,17 @@ namespace Chip8.CPU
                                 register.SubtractRegisterValue(y, x);
                                 break;
                             case 6:
+                                
                                 register.StoreValueOnRegister0xF((byte)(register[x] & 0x0001));
-                                register.StoreValue(x, (byte)(register[x] / 2));
+                                register.StoreValue(x, (byte)(register[x] >> 1));
                                 break;
                             case 7:
                                 register.StoreValueOnRegister0xF((byte)(register[y] > register[x] ? 1 : 0));
                                 register.StoreValue(x, (byte)(register[y] - register[x]));
                                 break;
                             case 0xE:
-                                register.StoreValueOnRegister0xF((byte)(register[x] & 0x0001));
-                                register.StoreValue(x, (byte)(register[x] * 2));
+                                register.StoreValueOnRegister0xF((byte)((register[x] & 0x1000)>>16));
+                                register.StoreValue(x, (byte)(register[x] << 1));
                                 break;
                         }
 
@@ -167,7 +168,9 @@ namespace Chip8.CPU
                                 register.StoreValue(x, DelayTimer);
                                 break;
                             case 0x0A:
-                                register.StoreValue(x, (byte)Console.ReadKey().KeyChar);
+                                var keyPressed = (byte)Console.ReadKey().Key;
+                                keyPressed = 1;
+                                register.StoreValue(x, keyPressed);
                                 break;
                             case 0x15:
                                 DelayTimer = register[x];
@@ -179,23 +182,18 @@ namespace Chip8.CPU
                                 ram.IncreaseRegisterI(register[x]);
                                 break;
                             case 0x29:
-                                ram.SetRegisterI((ushort)(register[x] * 5));
+                                ram.SetRegisterI(ram.GetFontAddress(register[x]));
                                 break;
                             case 0x33:
                                 var bcd = BCD.GetBytes(register[x]);
                                 ram.SetRegisterI(bcd);
                                 break;
                             case 0x55:
-                                for (int i = 0; i <= x; i++) ram.SetRegisterI(register[i]);
+                                ram.CopyValuesToRam(register.GetRegisters(0, x));
                                 break;
-                                //case 0x65:
-                                //    address = I;
-
-                                //    for (int i = 0; i <= x; i++)
-                                //    {
-                                //        V[i] = ram[address++];
-                                //    }
-                                //break;
+                            case 0x65:
+                                register.CopyValuesToRegisters(ram.GetValues(x), 0);
+                                break;
 
                         }
                         break;

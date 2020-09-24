@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace Chip8.CPU
@@ -9,6 +10,14 @@ namespace Chip8.CPU
         private byte[] ram = new byte[4096];
         private ushort PC = 0x200;
         private ushort I;
+        private Dictionary<byte, ushort> fontsAddress = new Dictionary<byte, ushort>();
+
+        public RAM()
+        {
+            StoreFonts();
+        }
+
+        public ushort GetFontAddress(byte font) => fontsAddress[font];
 
         public MemoryStack Stack { get; } = new MemoryStack();
 
@@ -17,10 +26,17 @@ namespace Chip8.CPU
 
         public void SetRegisterI(byte [] values)
         {
-            foreach (var value in values)
-            {
-                ram[I++] = value;
-            }
+            Buffer.BlockCopy(values, 0, ram, I, values.Length);
+        }
+        public void CopyValuesToRam(byte[] values)
+        {
+            Buffer.BlockCopy(values, 0, ram, I, values.Length);
+        }
+
+        public byte[] GetValues(int length)
+        {
+            var end = I + length + 1;
+            return ram[I..end];
         }
 
         public void LoadProgram(byte[] program)
@@ -48,6 +64,20 @@ namespace Chip8.CPU
             PC += 2;
 
             return instruction;
+        }
+
+        private void StoreFonts()
+        {
+            var allFonts = Fonts.All.Values.SelectMany(x=>x).ToArray();
+
+            ushort address = 0x050;
+
+            foreach (var font in Fonts.All)
+            {
+                fontsAddress.Add(font.Key, address+=5);
+            }
+
+            Buffer.BlockCopy(allFonts, 0, ram, 0x050, allFonts.Length);
         }
     }
 }

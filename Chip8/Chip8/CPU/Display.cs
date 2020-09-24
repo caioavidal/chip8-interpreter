@@ -25,26 +25,27 @@ namespace Chip8.CPU
         {
             foreach (var sprite in sprites)
             {
-                int currentX = x;
+                int currentX = x;//% 64;
+                int currentY = y; //% 32;
 
                 for (int j = 0; j < 8; j++)
                 {
-                    var pixel = (byte)(display[currentX, y] ^ (byte)((sprite >> (7 - j)) & 1));
+                    var pixel = (byte)(display[currentX, currentY] ^ (byte)((sprite >> (7 - j)) & 1));
 
-                    register.StoreValueOnRegister0xF((byte)((pixel == 0 && display[currentX, y] == 1) ? 1 : 0));
+                    register.StoreValueOnRegister0xF((byte)((pixel == 0 && display[currentX, currentY] == 1) ? 1 : 0));
 
-                    display[currentX, y] = pixel;
+                    display[currentX, currentY] = pixel;
 
                     if (pixel == 1)
                     {
-                        SdlManager.Instance.DrawPixel((byte)currentX, y);
+                        SdlManager.Instance.DrawPixel((byte)currentX, currentY);
                     }
                     else
                     {
-                        SdlManager.Instance.ClearPixel((byte)currentX, y);
+                        SdlManager.Instance.ClearPixel((byte)currentX, currentY);
                     }
 
-                    currentX++;
+                    currentX = ++currentX; //%64;
                 }
                 y++;
             }

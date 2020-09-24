@@ -10,6 +10,7 @@ namespace Chip8.CPU
     {
         private byte[] V = new byte[16];
 
+     
         public byte this[int index] 
         {
             get
@@ -17,6 +18,17 @@ namespace Chip8.CPU
                 ValidateRegister(index);
                 return V[index];
             }
+        }
+
+        public void CopyValuesToRegisters(byte[] values, int start)
+        {
+            Buffer.BlockCopy(values,0, V, start, values.Length);
+        }
+
+        public byte[] GetRegisters(int start, int length)
+        {
+            var end = start + length + 1;
+            return V[start..end];
         }
 
         public void StoreValue(int register, byte value)

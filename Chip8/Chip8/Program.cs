@@ -16,7 +16,7 @@ namespace Chip8
       
         static void Main(string[] args)
         {
-            new Cpu().StartProgram(File.ReadAllBytes("roms/IBM Logo.ch8"));
+            new Cpu().StartProgram(File.ReadAllBytes("roms/Keypad Test [Hap, 2006].ch8"));
         }
     }
 }

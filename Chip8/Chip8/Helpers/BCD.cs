@@ -14,7 +14,7 @@ namespace Chip8.Helpers
 
             byte[] bcd = new byte[] {
                     (byte)(hundreds),
-                    (byte)(tens << 4),
+                    (byte)(tens),
                     (byte)(ones)
                 };
 
