@@ -2,13 +2,15 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Chip8.CPU
 {
     public class Display
     {
-     
+        public static AutoResetEvent DisplayStarted { get; } = new AutoResetEvent(false);
+
         private byte[,] display = new byte[64, 32];
 
         public void Init()
@@ -28,8 +30,6 @@ namespace Chip8.CPU
                 for (int j = 0; j < 8; j++)
                 {
                     var pixel = (byte)(display[currentX, currentY] ^ (byte)((sprite >> (7 - j)) & 1));
-
-                   // register.StoreValueOnRegister0xF((byte)((pixel == 0 && display[currentX, currentY] == 1) ? 1 : 0));
 
                     overridePixel = (pixel == 0 && display[currentX, currentY] == 1);
 

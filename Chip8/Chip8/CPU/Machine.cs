@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Chip8.CPU
 {
@@ -11,6 +13,7 @@ namespace Chip8.CPU
         private readonly RAM ram = new RAM();
 
         private readonly Display display = new Display();
+
 
         public Machine()
         {
@@ -28,10 +31,13 @@ namespace Chip8.CPU
             if (ProgramLoaded)
             {
                 display.Init();
+                Display.DisplayStarted.WaitOne();
+                //Thread.Sleep(1500);
                 cpu.Run();
+
             }
         }
-        public void StartProgram(byte [] program)
+        public void StartProgram(byte[] program)
         {
             LoadProgram(program);
             StartProgram();

@@ -23,7 +23,6 @@ namespace Chip8.CPU
             this.ram = ram;
             this.display = display;
         }
-
         public void Run()
         {
             while (true)
@@ -186,11 +185,13 @@ namespace Chip8.CPU
                             ram.CopyValuesToRam(register.GetRegisters(0, param.X), register.I);
                             break;
                         case 0x65:
-                            register.CopyValuesToRegisters(ram.GetValues(register.I, param.X), 0);
+                            register.CopyValuesToRegisters(ram.GetValues(register.I, param.X, inclusive:true), 0);
                             break;
 
                     }
                     break;
+                default:
+                    throw new Exception("opcode not found");
             }
 
             Thread.Sleep(1);

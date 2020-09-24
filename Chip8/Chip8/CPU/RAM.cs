@@ -27,11 +27,17 @@ namespace Chip8.CPU
             Buffer.BlockCopy(values, 0, ram, start, values.Length);
         }
 
-        public byte[] GetValues(ushort start,int length)
+        public byte[] GetValues(ushort start,int length, bool inclusive = false)
         {
             var end = start + length;
+            if (inclusive)
+            {
+                end++;
+            }
+
             return ram[start..end];
         }
+
 
        // public void JumpToAddress(ushort address) => PC = address;
 
