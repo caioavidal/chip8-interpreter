@@ -11,9 +11,7 @@ namespace Chip8
 {
     class Program
     {
-    
 
-      
         static void Main(string[] args)
         {
             new Cpu().StartProgram(File.ReadAllBytes("roms/Keypad Test [Hap, 2006].ch8"));

@@ -74,7 +74,8 @@ namespace Chip8.CPU
 
             foreach (var font in Fonts.All)
             {
-                fontsAddress.Add(font.Key, address+=5);
+                fontsAddress.Add(font.Key, address);
+                address += 5;
             }
 
             Buffer.BlockCopy(allFonts, 0, ram, 0x050, allFonts.Length);

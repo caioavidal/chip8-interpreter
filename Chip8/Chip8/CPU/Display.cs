@@ -25,8 +25,8 @@ namespace Chip8.CPU
         {
             foreach (var sprite in sprites)
             {
-                int currentX = x;//% 64;
-                int currentY = y; //% 32;
+                int currentX = x % 64;
+                int currentY = y % 32;
 
                 for (int j = 0; j < 8; j++)
                 {
@@ -45,7 +45,7 @@ namespace Chip8.CPU
                         SdlManager.Instance.ClearPixel((byte)currentX, currentY);
                     }
 
-                    currentX = ++currentX; //%64;
+                    currentX = ++currentX%64;
                 }
                 y++;
             }
