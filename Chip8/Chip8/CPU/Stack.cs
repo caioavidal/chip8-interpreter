@@ -10,10 +10,10 @@ namespace Chip8.CPU
 
         public ushort ReturnFromSubroutine() => Stack.Pop();
 
-        public void CallSubroutine(ushort address, ref ushort PC)
+        public ushort CallSubroutine(ushort address)
         {
-            Stack.Push(PC);
-            PC = address;
+            Stack.Push(address);
+            return address;
         }
     }
 }

@@ -25,7 +25,7 @@ namespace Chip8.CPU
         private bool started = false;
         public void Init()
         {
-            if (SDL.SDL_Init(SDL.SDL_INIT_EVERYTHING) < 0)
+            if (SDL.SDL_Init(SDL.SDL_INIT_VIDEO) < 0)
             {
                 return;
             }
@@ -33,17 +33,23 @@ namespace Chip8.CPU
             if (SDL.SDL_CreateWindowAndRenderer(1024, 512, 0, out var window, out sdlRenderer) < 0) return;
 
             SDL.SDL_SetWindowTitle(window, "Chip 8 Emulator");
-            SDL.SDL_ShowCursor(1);
 
             SDL.SDL_RenderSetScale(sdlRenderer, 16, 16);
-            SDL.SDL_SetHint(SDL.SDL_HINT_RENDER_SCALE_QUALITY, "2");
+           // SDL.SDL_SetHint(SDL.SDL_HINT_RENDER_SCALE_QUALITY, "2");
 
             started = true;
 
             Task.Run(() =>
             {
-                while (true)
+
+                while (SDL.SDL_PollEvent(out var sdlEvent) > 0)
                 {
+
+                    //switch(sdlEvent.type) {
+                    //    case SDL.SDL_EventType.SDL_QUIT:
+                    //      return;
+                    //  }
+
                     lastFrame = SDL.SDL_GetTicks();
                     if (lastFrame >= (lastTime + 1000))
                     {
@@ -51,8 +57,13 @@ namespace Chip8.CPU
                         fps = frameCount;
                         frameCount = 0;
                     }
+
+                    SDL.SDL_Delay(10);
+                    //    SDL.SDL_UpdateWindowSurface(window);
+
                 }
             });
+            
         }
 
 

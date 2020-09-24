@@ -8,8 +8,9 @@ namespace Chip8.CPU
 {
     public class Register
     {
-        private byte[] V = new byte[16];
-
+        private byte[] V = new byte[16]; // general registers
+        public ushort I { get; private set; } //instruction register
+        public ushort PC { get; private set; } = 0x200;// program counter register
      
         public byte this[int index] 
         {
@@ -19,6 +20,18 @@ namespace Chip8.CPU
                 return V[index];
             }
         }
+
+        public void SetRegisterI(ushort value) => I = value;
+        public void IncreaseRegisterI(ushort value) => I += value;
+
+        public void IncrementPC() => PC += 2;
+
+        public void JumpToAddress(ushort address) => PC = address;
+
+        //public void SetRegisterI(byte[] values)
+        //{
+        //    Buffer.BlockCopy(values, 0, ram, I, values.Length);
+        //}
 
         public void CopyValuesToRegisters(byte[] values, int start)
         {

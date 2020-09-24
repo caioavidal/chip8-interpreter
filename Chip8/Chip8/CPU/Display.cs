@@ -8,12 +8,7 @@ namespace Chip8.CPU
 {
     public class Display
     {
-        private Register register;
-
-        public Display(Register register)
-        {
-            this.register = register;
-        }
+     
         private byte[,] display = new byte[64, 32];
 
         public void Init()
@@ -21,8 +16,10 @@ namespace Chip8.CPU
             SdlManager.Instance.Init();
         }
 
-        public void Draw(byte[] sprites, int x, int y)
+        public void Draw(byte[] sprites, int x, int y, out bool overridePixel)
         {
+            overridePixel = false;
+
             foreach (var sprite in sprites)
             {
                 int currentX = x % 64;
@@ -32,7 +29,9 @@ namespace Chip8.CPU
                 {
                     var pixel = (byte)(display[currentX, currentY] ^ (byte)((sprite >> (7 - j)) & 1));
 
-                    register.StoreValueOnRegister0xF((byte)((pixel == 0 && display[currentX, currentY] == 1) ? 1 : 0));
+                   // register.StoreValueOnRegister0xF((byte)((pixel == 0 && display[currentX, currentY] == 1) ? 1 : 0));
+
+                    overridePixel = (pixel == 0 && display[currentX, currentY] == 1);
 
                     display[currentX, currentY] = pixel;
 

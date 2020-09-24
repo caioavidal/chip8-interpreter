@@ -8,8 +8,8 @@ namespace Chip8.CPU
     public class RAM
     {
         private byte[] ram = new byte[4096];
-        private ushort PC = 0x200;
-        private ushort I;
+       // private ushort PC = 0x200;
+        //private ushort I;
         private Dictionary<byte, ushort> fontsAddress = new Dictionary<byte, ushort>();
 
         public RAM()
@@ -21,50 +21,32 @@ namespace Chip8.CPU
 
         public MemoryStack Stack { get; } = new MemoryStack();
 
-        public void SetRegisterI(ushort value) => I = value;
-        public void IncreaseRegisterI(ushort value) => I += value;
-
-        public void SetRegisterI(byte [] values)
+     
+        public void CopyValuesToRam(byte[] values, ushort start)
         {
-            Buffer.BlockCopy(values, 0, ram, I, values.Length);
-        }
-        public void CopyValuesToRam(byte[] values)
-        {
-            Buffer.BlockCopy(values, 0, ram, I, values.Length);
+            Buffer.BlockCopy(values, 0, ram, start, values.Length);
         }
 
-        public byte[] GetValues(int length)
+        public byte[] GetValues(ushort start,int length)
         {
-            var end = I + length + 1;
-            return ram[I..end];
+            var end = start + length;
+            return ram[start..end];
         }
 
-        public void LoadProgram(byte[] program)
-        {
-            Buffer.BlockCopy(program, 0, ram, PC, program.Length);
-        }
+       // public void JumpToAddress(ushort address) => PC = address;
 
-        public void JumpToAddress(ushort address) => PC = address;
+        public ushort ReturnFromSubroutine() =>  Stack.ReturnFromSubroutine();
 
-        public ushort ReturnFromSubroutine() => PC = Stack.ReturnFromSubroutine();
+        public void CallSubroutine(ushort address) => Stack.CallSubroutine(address);
+        //public void SkipNextInstruction() => PC += 2;
 
-        public void CallSubroutine(ushort address) => Stack.CallSubroutine(address, ref PC);
-        public void SkipNextInstruction() => PC += 2;
+        //public byte[] GetSprites(ushort start, int length)
+        //{
+        //    var end = start + length;
+        //    return ram[start..end];
+        //}
 
-        public byte[] GetSprites(int length)
-        {
-            var end = I + length;
-            return ram[I..end];
-        }
-
-        public ushort GetNextInstruction()
-        {
-            var instruction = (ushort)(ram[PC] << 8 | ram[PC + 1]);
-
-            PC += 2;
-
-            return instruction;
-        }
+        public ushort GetNextInstruction(in ushort PC) => (ushort)(ram[PC] << 8 | ram[PC + 1]);
 
         private void StoreFonts()
         {
