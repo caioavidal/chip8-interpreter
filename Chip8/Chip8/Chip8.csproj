@@ -6,10 +6,19 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Reference Include="SDL2-CS">
+      <HintPath>sdl\SDL2-CS.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
     <None Update="roms\IBM Logo.ch8">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="roms\Pong.ch8">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="SDL2.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
