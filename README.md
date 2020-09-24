@@ -1,2 +1,2 @@
 # chip8
-A chip8 interpreter written in C#
+This is a chip8 interpreter written in C# using SDL2 library to draw graphics
