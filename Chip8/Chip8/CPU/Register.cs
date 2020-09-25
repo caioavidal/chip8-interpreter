@@ -74,14 +74,7 @@ namespace Chip8.CPU
             V[x] += V[y];
             V[0xF] = (byte)(V[x] + V[y] > 255 ? 1 : 0);
         }
-        public void StoreValueOfRegisterInOther(int sourceRegister, int destinationRegister)
-        {
-            ValidateRegister(sourceRegister);
-            ValidateRegister(destinationRegister);
-
-            V[destinationRegister] = V[sourceRegister];
-        }
-
+      
         /// <summary>
         /// Take values of firstRegistor and secondRegistor, do a operation and store value in destination register
         /// </summary>

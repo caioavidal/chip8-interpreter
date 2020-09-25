@@ -18,6 +18,7 @@ namespace Chip8.CPU
         public Machine()
         {
             cpu = new Cpu(display, ram);
+            display.SpriteCreated += SdlManager.Instance.DrawSprite;
         }
         public bool ProgramLoaded { get; private set; }
 
@@ -35,7 +36,6 @@ namespace Chip8.CPU
                 Display.DisplayStarted.WaitOne();
 
                 cpu.Run();
-
             }
         }
         public void StartProgram(byte[] program)

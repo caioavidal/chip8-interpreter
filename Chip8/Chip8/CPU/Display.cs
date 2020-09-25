@@ -1,6 +1,8 @@
 ﻿using SDL2;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -11,44 +13,49 @@ namespace Chip8.CPU
     {
         public static AutoResetEvent DisplayStarted { get; } = new AutoResetEvent(false);
 
-        private byte[,] display = new byte[64, 32];
+        private uint[,] display = new uint[64, 32];
+
 
         public void Init()
         {
             SdlManager.Instance.Init();
         }
 
-        public void Draw(byte[] sprites, int x, int y, out bool overridePixel)
+        public void Draw(byte[] sprites, int x, int y, out byte overridePixel)
         {
-            overridePixel = false;
+            List<Pixel> pixels = new List<Pixel>();
+
+            overridePixel = 0;
 
             foreach (var sprite in sprites)
             {
+                
                 int currentX = x % 64;
                 int currentY = y % 32;
 
                 for (int j = 0; j < 8; j++)
                 {
-                    var pixel = (byte)(display[currentX, currentY] ^ (byte)((sprite >> (7 - j)) & 1));
+                    var spritePixel = (byte)((sprite >> (7 - j)) & 0x01);
 
-                    overridePixel = (pixel == 0 && display[currentX, currentY] == 1);
+                    if (spritePixel == 1 && display[currentX, currentY] != 0)
+                        overridePixel = 1;
 
-                    display[currentX, currentY] = pixel;
+                    display[currentX, currentY] = (display[currentX, currentY] != 0 && spritePixel == 0) || (display[currentX, currentY] ==0 && spritePixel == 1) ? 0xffffffff  : 0;
 
-                    if (pixel == 1)
-                    {
-                        SdlManager.Instance.DrawPixel((byte)currentX, currentY);
-                    }
-                    else
-                    {
-                        SdlManager.Instance.ClearPixel((byte)currentX, currentY);
-                    }
+                    pixels.Add(new Pixel((byte)currentX, (byte)currentY, display[currentX, currentY]));
 
-                    currentX = ++currentX%64;
+                    currentX = ++currentX % 64;
                 }
                 y++;
             }
+
+            SpriteCreated?.Invoke(pixels.ToArray());
         }
+
+
         public void ClearDisplay() => Array.Clear(display, 0, display.Length);
+
+        public delegate void DrawSprite(Pixel[] pixels);
+        public event DrawSprite SpriteCreated;
     }
 }

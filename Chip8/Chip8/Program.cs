@@ -14,8 +14,6 @@ namespace Chip8
 
         static void Main(string[] args)
         {
-           
-         
             new Machine().StartProgram(File.ReadAllBytes("roms/Pong.ch8"));
         }
     }

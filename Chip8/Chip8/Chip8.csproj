@@ -6,12 +6,27 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="roms\Pong [Paul Vervalin, 1990].ch8" />
+    <None Remove="roms\test_opcode.ch8" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Reference Include="SDL2-CS">
       <HintPath>sdl\SDL2-CS.dll</HintPath>
     </Reference>
   </ItemGroup>
 
   <ItemGroup>
+    <Resource Include="roms\Pong [Paul Vervalin, 1990].ch8" />
+    <Resource Include="roms\test_opcode.ch8">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="roms\Brix.ch8">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="roms\Chip8 Picture.ch8">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -30,7 +45,10 @@
     <None Update="roms\Pong.ch8">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="roms\test_opcode.ch8">
+    <None Update="roms\Pong2.ch8">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="roms\Puzzle.ch8">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="SDL2.dll">

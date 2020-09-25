@@ -5,18 +5,19 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace Chip8.CPU
 {
     public class Cpu
     {
         private readonly RAM ram;
-        private byte DelayTimer;
-        private byte SoundTimer;
-        private byte Keyboard;
+        private Timer timer = new Timer();
+        public static byte Keyboard;
         private Register register = new Register();
         private readonly Display display;
         private Random Random = new Random(Environment.TickCount);
+
 
         public Cpu(Display display, RAM ram)
         {
@@ -25,13 +26,19 @@ namespace Chip8.CPU
         }
         public void Run()
         {
+            timer.Start();
+
             while (true)
             {
                 var opcode = Fetch();
                 var param = Decode(opcode);
                 Execute(param);
+
+                timer.UpdateTimers();
             }
         }
+
+
 
         private ushort Fetch()
         {
@@ -48,10 +55,15 @@ namespace Chip8.CPU
             {
                 case 0x0000:
                     if (param.Value == 0x00e0) display.ClearDisplay();
-                    if (param.Value == 0x00ee)
+                    else if (param.Value == 0x00ee)
                     {
                         var address = ram.ReturnFromSubroutine();
                         register.JumpToAddress(address);
+                        break;
+                    }
+                    else
+                    {
+                        throw new InvalidOperationException("opcode not found");
                     }
                     break;
 
@@ -65,7 +77,8 @@ namespace Chip8.CPU
                     break;
 
                 case 0x3000:
-                    if (register[param.X] == param.NN) register.IncrementPC();
+                    if (register[param.X] == param.NN)
+                        register.IncrementPC();
                     break;
 
                 case 0x4000:
@@ -89,17 +102,17 @@ namespace Chip8.CPU
 
                     switch (last)
                     {
-                        case 0: register.StoreValueOfRegisterInOther(param.Y, param.X); break;
-                        case 1: register.CalculateRegistersAndStoreValue(param.X, param.X, param.Y, Helpers.BitOperationType.OR); break;
-                        case 2: register.CalculateRegistersAndStoreValue(param.X, param.X, param.Y, Helpers.BitOperationType.AND); break;
-                        case 3: register.CalculateRegistersAndStoreValue(param.X, param.X, param.Y, Helpers.BitOperationType.XOR); break;
+                        case 0: register.StoreValue(param.X, register[param.Y]); break;
+                        case 1: register.CalculateRegistersAndStoreValue(param.X, param.X, param.Y, BitOperationType.OR); break;
+                        case 2: register.CalculateRegistersAndStoreValue(param.X, param.X, param.Y, BitOperationType.AND); break;
+                        case 3: register.CalculateRegistersAndStoreValue(param.X, param.X, param.Y, BitOperationType.XOR); break;
                         case 4:
                             register.StoreValueOnRegister0xF((byte)(register[param.X] + register[param.Y] > 255 ? 1 : 0));
-                            register.IncrementRegisterValue(param.X, register[param.Y]);
+                            register.StoreValue(param.X, (byte)((register[param.X] + register[param.Y]) & 0x00FF));
                             break;
                         case 5:
                             register.StoreValueOnRegister0xF((byte)(register[param.X] > register[param.Y] ? 1 : 0));
-                            register.SubtractRegisterValue(param.Y, param.X);
+                            register.StoreValue(param.X, (byte)((register[param.X] - register[param.Y]) & 0x00FF));
                             break;
                         case 6:
 
@@ -108,12 +121,14 @@ namespace Chip8.CPU
                             break;
                         case 7:
                             register.StoreValueOnRegister0xF((byte)(register[param.Y] > register[param.X] ? 1 : 0));
-                            register.StoreValue(param.X, (byte)(register[param.Y] - register[param.X]));
+                            register.StoreValue(param.X, (byte)((register[param.Y] - register[param.X]) & 0x00FF));
                             break;
                         case 0xE:
-                            register.StoreValueOnRegister0xF((byte)((register[param.X] & 0x1000) >> 16));
+                            register.StoreValueOnRegister0xF((byte)((register[param.X] & 0x80) == 0x80 ? 1 : 0));
                             register.StoreValue(param.X, (byte)(register[param.X] << 1));
                             break;
+                        default:
+                            throw new InvalidOperationException("opcode not found");
                     }
 
                     break;
@@ -125,10 +140,11 @@ namespace Chip8.CPU
                     register.SetRegisterI(param.NNN); break;
 
                 case 0xB000:
-                    register.JumpToAddress((ushort)(register[0] + param.NNN)); break;
+                    register.JumpToAddress((ushort)(register[0] + param.NNN)); return;
 
                 case 0xC000:
-                    register.StoreValue(param.X, (byte)((byte)Random.Next(0, byte.MaxValue) & param.NN)); break;
+                    register.StoreValue(param.X, (byte)((byte)Random.Next(0, byte.MaxValue) & param.NN));
+                    break;
 
                 case 0xE000:
                     last = (byte)(param.Value & 0x000F);
@@ -141,15 +157,16 @@ namespace Chip8.CPU
                         case 1:
                             if (register[param.X] != Keyboard) register.IncrementPC();
                             break;
-                    }
+                        default:
+                            throw new InvalidOperationException("opcode not found");
 
+                    }
                     break;
 
                 case 0xD000:
                     var sprites = ram.GetValues(register.I, param.N);
                     display.Draw(sprites, register[param.X], register[param.Y], out var overridePixel);
-                    register.StoreValueOnRegister0xF(Convert.ToByte(overridePixel));
-
+                    register.StoreValueOnRegister0xF(overridePixel);
                     break;
 
                 case 0xF000:
@@ -158,7 +175,7 @@ namespace Chip8.CPU
                     switch (last)
                     {
                         case 0x7: //FX07
-                            register.StoreValue(param.X, DelayTimer);
+                            register.StoreValue(param.X, timer.DelayTimer);
                             break;
                         case 0x0A:
                             var keyPressed = (byte)Console.ReadKey().Key;
@@ -166,10 +183,10 @@ namespace Chip8.CPU
                             register.StoreValue(param.X, keyPressed);
                             break;
                         case 0x15:
-                            DelayTimer = register[param.X];
+                            timer.SetTimer(TimerType.Delay, register[param.X]);
                             break;
                         case 0x18: //FX18
-                            SoundTimer = register[param.X];
+                            timer.SetTimer(TimerType.Sound, register[param.X]);
                             break;
                         case 0x1E:
                             register.IncreaseRegisterI(register[param.X]);
@@ -185,9 +202,10 @@ namespace Chip8.CPU
                             ram.CopyValuesToRam(register.GetRegisters(0, param.X), register.I);
                             break;
                         case 0x65:
-                            register.CopyValuesToRegisters(ram.GetValues(register.I, param.X, inclusive:true), 0);
+                            register.CopyValuesToRegisters(ram.GetValues(register.I, param.X, inclusive: true), 0);
                             break;
-
+                        default:
+                            throw new InvalidOperationException("opcode not found");
                     }
                     break;
                 default:
