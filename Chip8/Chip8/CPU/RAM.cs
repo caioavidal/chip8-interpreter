@@ -8,8 +8,7 @@ namespace Chip8.CPU
     public class RAM
     {
         private byte[] ram = new byte[4096];
-       // private ushort PC = 0x200;
-        //private ushort I;
+
         private Dictionary<byte, ushort> fontsAddress = new Dictionary<byte, ushort>();
 
         public RAM()
@@ -38,20 +37,10 @@ namespace Chip8.CPU
             return ram[start..end];
         }
 
-
-       // public void JumpToAddress(ushort address) => PC = address;
-
         public ushort ReturnFromSubroutine() =>  Stack.ReturnFromSubroutine();
 
         public void CallSubroutine(ushort address) => Stack.CallSubroutine(address);
-        //public void SkipNextInstruction() => PC += 2;
-
-        //public byte[] GetSprites(ushort start, int length)
-        //{
-        //    var end = start + length;
-        //    return ram[start..end];
-        //}
-
+       
         public ushort GetNextInstruction(in ushort PC) => (ushort)(ram[PC] << 8 | ram[PC + 1]);
 
         private void StoreFonts()

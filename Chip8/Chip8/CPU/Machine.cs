@@ -31,8 +31,9 @@ namespace Chip8.CPU
             if (ProgramLoaded)
             {
                 display.Init();
+
                 Display.DisplayStarted.WaitOne();
-                //Thread.Sleep(1500);
+
                 cpu.Run();
 
             }

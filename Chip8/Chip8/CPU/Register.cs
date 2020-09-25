@@ -28,11 +28,6 @@ namespace Chip8.CPU
 
         public void JumpToAddress(ushort address) => PC = address;
 
-        //public void SetRegisterI(byte[] values)
-        //{
-        //    Buffer.BlockCopy(values, 0, ram, I, values.Length);
-        //}
-
         public void CopyValuesToRegisters(byte[] values, int start)
         {
             Buffer.BlockCopy(values,0, V, start, values.Length);
