@@ -96,6 +96,7 @@ namespace Chip8.CPU
             }
         }
 
-
+        public void DecrementPC() => PC -= 2;
+        
     }
 }

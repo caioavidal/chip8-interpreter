@@ -14,10 +14,11 @@ namespace Chip8.CPU
         private readonly RAM ram;
         private Timer timer = new Timer();
         public static byte Keyboard;
+        public static AutoResetEvent WaitingForKeyboardEvent = new AutoResetEvent(false);
         private Register register = new Register();
         private readonly Display display;
         private Random Random = new Random(Environment.TickCount);
-
+        
 
         public Cpu(Display display, RAM ram)
         {
@@ -30,15 +31,13 @@ namespace Chip8.CPU
 
             while (true)
             {
-                var opcode = Fetch();
-                var param = Decode(opcode);
-                Execute(param);
+                    var opcode = Fetch();
+                    var param = Decode(opcode);
+                    Execute(param);
 
-                timer.UpdateTimers();
+                    timer.UpdateTimers();
             }
         }
-
-
 
         private ushort Fetch()
         {
@@ -178,9 +177,8 @@ namespace Chip8.CPU
                             register.StoreValue(param.X, timer.DelayTimer);
                             break;
                         case 0x0A:
-                            var keyPressed = (byte)Console.ReadKey().Key;
-                            keyPressed = 1;
-                            register.StoreValue(param.X, keyPressed);
+                            WaitingForKeyboardEvent.WaitOne();
+                             register.StoreValue(param.X, Keyboard);
                             break;
                         case 0x15:
                             timer.SetTimer(TimerType.Delay, register[param.X]);

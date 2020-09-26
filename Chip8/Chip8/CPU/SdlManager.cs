@@ -83,6 +83,7 @@ namespace Chip8.CPU
                                     case SDL.SDL_Keycode.SDLK_e: Cpu.Keyboard = 0xE; break;
                                     case SDL.SDL_Keycode.SDLK_f: Cpu.Keyboard = 0xF; break;
                                 }
+                                Cpu.WaitingForKeyboardEvent.Set();// = false;
                                 break;
                             case SDL.SDL_EventType.SDL_KEYUP:
                                 Cpu.Keyboard = 0; break;
