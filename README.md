@@ -13,7 +13,6 @@ This is a chip8 interpreter written in C# using SDL2 library.
 
 * Github: [@caioavidal](https://github.com/caioavidal)
 * LinkedIn: [https:\/\/www.linkedin.com\/in\/caiovidal](https:\/\/www.linkedin.com\/in\/caiovidal)
-* Discord Invite: https://discord.gg/Kazq9z2
 ## Show your support
 
 Give a ⭐️ if this project helped you!
